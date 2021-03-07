@@ -1,0 +1,45 @@
+﻿using MySql.Data.MySqlClient;
+
+namespace MigrationMSSQL
+{
+    class OutputMysqlPred
+    {
+        public string OutputData()
+        {
+            string result = "";
+            try
+            {
+                var builder = new MySqlConnectionStringBuilder
+                {
+                    Server = "192.168.98.9",
+                    UserID = "ASUTP",
+                    Password = "15793",
+                    Port = 3306
+                };
+                using (var connection = new MySqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT * FROM `millkoscan`.`prediction` ORDER BY SampRef DESC LIMIT 1;";
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                result = reader.GetValue(0).ToString();
+                            }
+                        }
+                        connection.Close();
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                new Logging().writeLog(e.ToString());
+            }
+            return result;
+        }
+    }
+}
